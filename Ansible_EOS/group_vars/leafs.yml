@@ -1,0 +1,16 @@
+global_vlans:
+  - id: 10
+    name: DMZ
+    state: active
+  - id: 20
+    name: Internal
+    state: active
+  - id: 30
+    name: Marketing
+    state: active
+  - id: 40
+    name: Sales
+    state: active
+  - id: 50
+    name: HR
+    state: active
