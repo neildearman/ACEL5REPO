@@ -1,0 +1,17 @@
+---
+tenants:
+  - name: ACME
+    mac_vrf_vni_base: 10000
+    vrfs:
+      - name: VRF_A
+        vrf_vni: 10
+        svis:
+          - id: 10
+            name: VLAN10
+            enabled: true
+            ip_address_virtual: 172.17.10.254/24
+          - id: 20
+            name: VLAN20
+            enabled: true
+            ip_address_virtual: 172.17.20.254/24
+               
