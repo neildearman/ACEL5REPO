@@ -17,6 +17,7 @@
   - [VLANs Device Configuration](#vlans-device-configuration)
 - [Interfaces](#interfaces)
   - [Ethernet Interfaces](#ethernet-interfaces)
+  - [Port-Channel Interfaces](#port-channel-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
   - [VLAN Interfaces](#vlan-interfaces)
   - [VXLAN Interface](#vxlan-interface)
@@ -169,7 +170,8 @@ vlan 40
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet9 |  host4_Ethernet1 | access | 40 | - | - | - |
+| Ethernet7 | host3_Ethernet2 | *access | *30 | *- | *- | 7 |
+| Ethernet9 | host4_Ethernet2 | *access | *40 | *- | *- | 9 |
 
 *Inherited from Port-Channel Interface
 
@@ -214,12 +216,61 @@ interface Ethernet6
    no switchport
    ip address 10.10.1.31/31
 !
-interface Ethernet9
-   description host4_Ethernet1
+interface Ethernet7
+   description host3_Ethernet2
    no shutdown
-   switchport access vlan 40
-   switchport mode access
+   channel-group 7 mode active
+!
+interface Ethernet9
+   description host4_Ethernet2
+   no shutdown
+   channel-group 9 mode active
+```
+
+### Port-Channel Interfaces
+
+#### Port-Channel Interfaces Summary
+
+##### L2
+
+| Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
+| --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
+| Port-Channel7 | host3_PortChannel host3 | switched | access | 30 | - | - | - | - | - | 0000:0000:0303:0202:0101 |
+| Port-Channel9 | host4_PortChannel host4 | switched | access | 40 | - | - | - | - | - | 0000:0000:0404:0202:0101 |
+
+##### EVPN Multihoming
+
+####### EVPN Multihoming Summary
+
+| Interface | Ethernet Segment Identifier | Multihoming Redundancy Mode | Route Target |
+| --------- | --------------------------- | --------------------------- | ------------ |
+| Port-Channel7 | 0000:0000:0303:0202:0101 | all-active | 03:03:02:02:01:01 |
+| Port-Channel9 | 0000:0000:0404:0202:0101 | all-active | 04:04:02:02:01:01 |
+
+#### Port-Channel Interfaces Device Configuration
+
+```eos
+!
+interface Port-Channel7
+   description host3_PortChannel host3
+   no shutdown
    switchport
+   switchport access vlan 30
+   evpn ethernet-segment
+      identifier 0000:0000:0303:0202:0101
+      route-target import 03:03:02:02:01:01
+   lacp system-id 0303.0202.0101
+   spanning-tree portfast
+!
+interface Port-Channel9
+   description host4_PortChannel host4
+   no shutdown
+   switchport
+   switchport access vlan 40
+   evpn ethernet-segment
+      identifier 0000:0000:0404:0202:0101
+      route-target import 04:04:02:02:01:01
+   lacp system-id 0404.0202.0101
    spanning-tree portfast
 ```
 
