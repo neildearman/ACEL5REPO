@@ -9,18 +9,22 @@ cvp_devices:
     configlets:
       - AVD_borderleaf2
   - fqdn: leaf1
+    parentContainerName: LEAFS12
     parentContainerName: LEAFS
     configlets:
       - AVD_leaf1
   - fqdn: leaf2
+    parentContainerName: LEAFS12
     parentContainerName: LEAFS
     configlets:
       - AVD_leaf2
   - fqdn: leaf3
+    parentContainerName: LEAFS34
     parentContainerName: LEAFS
     configlets:
       - AVD_leaf3
   - fqdn: leaf4
+    parentContainerName: LEAFS34
     parentContainerName: LEAFS
     configlets:
       - AVD_leaf4
@@ -43,6 +47,10 @@ cvp_devices:
 cvp_containers:
   FABRIC:
     parentContainerName: Tenant
+  LEAFS12:
+    parentContainerName: FABRIC
+  LEAFS34:
+    parentContainerName: FABRIC
   LEAFS:
     parentContainerName: FABRIC
   SPINES:
