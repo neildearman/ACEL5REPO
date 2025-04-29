@@ -1,0 +1,56 @@
+---
+- name: Advanced BGP Configuration on Arista EOS with Peer-Group
+  hosts: eos_switches
+  gather_facts: false
+  collections:
+    - arista.eos
+
+  tasks:
+    - name: Configure BGP Global Settings with Peer Group
+      eos_bgp_global:
+        config:
+          as_number: 65001
+          router_id: 1.1.1.1
+          address_family:
+            - afi: ipv4
+              safi: unicast
+              redistribute_routes:
+                - protocol: connected
+              maximum_paths:
+                paths: 4
+                ecmp: true
+          peer_groups:
+            - name: LEAFS
+              remote_as: 65002
+              description: "Peer group for leaf switches"
+              address_family:
+                - afi: ipv4
+                  safi: unicast
+                  activate: true
+                  route_map_in: IMPORT_POLICY
+                  route_map_out: EXPORT_POLICY
+        state: merged
+
+    - name: Configure BGP Neighbor and assign to Peer Group
+      eos_bgp_neighbor:
+        config:
+          as_number: 65001
+          neighbors:
+            - neighbor_address: 10.0.12.2
+              peer_group: LEAFS
+              update_source: Ethernet1
+        state: merged
+
+    - name: Configure Route Maps
+      eos_config:
+        lines:
+          - route-map IMPORT_POLICY permit 10
+          - match ip address prefix-list PL_IMPORT
+          - route-map EXPORT_POLICY permit 10
+          - match ip address prefix-list PL_EXPORT
+
+    - name: Configure Prefix Lists
+      eos_config:
+        lines:
+          - ip prefix-list PL_IMPORT seq 10 permit 192.168.0.0/16
+          - ip prefix-list PL_EXPORT seq 10 permit 10.0.0.0/8

@@ -1,0 +1,41 @@
+bgp_as: 65201
+bgp_router_id: 1.1.1.1
+
+bgp_address_family:
+  - afi: ipv4
+    safi: unicast
+    redistribute_routes:
+      - protocol: connected
+    maximum_paths:
+      paths: 4
+      ecmp: true
+
+bgp_peer_groups:
+  - name: SPINES
+    remote_as: 65200
+    description: "Peer group for spine switches"
+    address_family:
+      - afi: ipv4
+        safi: unicast
+        activate: true
+        route_map_in: IMPORT_POLICY
+        route_map_out: EXPORT_POLICY
+
+bgp_neighbors:
+  - neighbor_address: 10.0.12.2
+    peer_group: SPINES
+    update_source: Ethernet1
+
+  - neighbor_address: 10.0.13.2
+    peer_group: SPINES
+    update_source: Ethernet2
+
+route_maps:
+  - route-map IMPORT_POLICY permit 10
+  - match ip address prefix-list PL_IMPORT
+  - route-map EXPORT_POLICY permit 10
+  - match ip address prefix-list PL_EXPORT
+
+prefix_lists:
+  - ip prefix-list PL_IMPORT seq 10 permit 192.168.0.0/16
+  - ip prefix-list PL_EXPORT seq 10 permit 10.0.0.0/8

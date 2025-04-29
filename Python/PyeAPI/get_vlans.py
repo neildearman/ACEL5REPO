@@ -10,7 +10,7 @@ for switch in vlan_file_dict['switches']:
     connect = pyeapi.connect_to(switch)
     raw_cmd_result = connect.enable('show vlan')
     cmd_vlan_dict = (raw_cmd_result[0]['result']['vlans'])
-    print(f'For switch {switch}')
+    print(f'Vlans present on switch {switch}')
     for vlan in cmd_vlan_dict:
         vlan_id = vlan
         vlan_name = (cmd_vlan_dict[vlan]['name'])

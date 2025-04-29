@@ -1,0 +1,11 @@
+switches:
+  - name: borderleaf1
+    host: 192.168.0.25
+    transport: https
+    username: arista
+    password: aristapghp
+  - name: borderleaf2
+    host: 192.168.0.26
+    transport: https
+    username: arista
+    password: aristapghp

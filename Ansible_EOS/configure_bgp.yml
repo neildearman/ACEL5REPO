@@ -1,0 +1,69 @@
+---
+- name: Advanced BGP Configuration on Arista EOS with Peer-Group
+  hosts: leaf1
+  gather_facts: false
+
+  tasks:
+    - name: Create or update BGP Peer Group
+      arista.eos.eos_bgp_global:
+        config:
+          - peer_group:
+              name: "my_peer_group"
+              address: "192.168.1.1/32"  # Example address for the peer group
+              as_number: "65001"  # Example remote AS number
+              log_neighbor_changes: true
+            # Add any other peer group attributes here, as needed.
+        state: merged
+
+  # tasks:
+  #   - name: Configure BGP Global Settings with Peer Group
+  #     arista.eos.eos_bgp_global:
+  #       config:
+  #         as_number: 65201
+  #         router_id: 1.1.1.1
+  #         maximum_paths:
+  #           max_equal_cost_paths: 4
+  #           max_installed_ecmp_paths: 4
+  #       state: merged
+
+    # - name: Configure BGP Neighbor and assign to Peer Group
+    #   arista.eos.eos_bgp_address_family:
+    #     config:
+    #       address_family:
+    #         - afi: "ipv4"
+    #           neighbor:
+    #             - peer: SpineUnderlay
+    #               activate: true
+    #           network:
+    #           - address: "1.1.1.0/24"
+    #           - address: "1.5.1.0/24"
+
+
+
+
+    #         - neighbor_address: 10.0.12.2
+    #           peer_group: SpineUnderlay
+    #           description: "Spine1Underlay"
+    #           remote_as: 65200
+    #           description: "Peer group for Spine switches"
+    #           address_family:
+    #             - afi: ipv4
+    #               safi: unicast
+    #               activate: true
+    #               route_map_in: IMPORT_POLICY
+    #               route_map_out: EXPORT_POLICY
+    #     state: merged
+
+    # - name: Configure Route Maps
+    #   eos_config:
+    #     lines:
+    #       - route-map IMPORT_POLICY permit 10
+    #       - match ip address prefix-list PL_IMPORT
+    #       - route-map EXPORT_POLICY permit 10
+    #       - match ip address prefix-list PL_EXPORT
+
+    # - name: Configure Prefix Lists
+    #   eos_config:
+    #     lines:
+    #       - ip prefix-list PL_IMPORT seq 10 permit 192.168.0.0/16
+    #       - ip prefix-list PL_EXPORT seq 10 permit 10.0.0.0/8

@@ -1,10 +1,10 @@
 - name: Configure BGP
   hosts: leaf1
   tasks:
-    - name: Configure global bgp as 65535
+    - name: Configure global bgp as 65201
       arista.eos.eos_bgp_address_family:
         config:
-          as_number: "10"
+          as_number: "65201"
           address_family:
             - afi: "ipv4"
               redistribute:
@@ -14,11 +14,11 @@
                 - address: "1.1.1.0/24"
                 - address: "1.5.1.0/24"
                   route_map: "MAP01"
-            - afi: "ipv6"
-              bgp_params:
-                additional_paths: "receive"
+            # - afi: "ipv6"
+            #   bgp_params:
+            #     additional_paths: "receive"
               neighbor:
-                - peer: "peer2"
+                - peer: "leaf2"
                   default_originate:
                     always: true
             - afi: "ipv6"

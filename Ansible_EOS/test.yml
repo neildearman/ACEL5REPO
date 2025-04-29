@@ -1,0 +1,27 @@
+---
+
+- name: Test playbook for syntax experience
+  hosts: leaf1
+  vars_files:
+    - group_vars/neil.yml
+  tasks:
+    - name: Create a VLANs.
+      arista.eos.eos_vlans:
+        config:
+          - name: Internal
+            vlan_id: "{{ VLANS['vlan20'] }}"
+            state: active
+        state: merged
+
+    - name: Delete a vlan.
+      arista.eos.eos_vlans:
+        config:
+          - vlan_id: "{{ gg[0]['id'] }}"
+        state: deleted
+
+    - name: Change the hostname.
+      arista.eos.eos_hostname:
+        config:
+          hostname: "{{ HOSTNAMES[0]['paul'] }}"
+
+
