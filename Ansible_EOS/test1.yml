@@ -123,3 +123,10 @@
             state: active
         state: merged
       loop: "{{ vlan_loop }}"
+
+    - name: Delete all vlans.
+      arista.eos.eos_vlans:
+        config:
+          - vlan_id: "{{ item }}"
+        state: deleted
+      loop: "{{ vlan_loop }}"
