@@ -98,12 +98,28 @@
           router_id: 9.9.9.9
         state: merged
 
-    - name: Configure BGP neighbors
-      arista.eos.eos_bgp:
+    # - name: Configure BGP neighbors
+    #   arista.eos.eos_bgp:
+    #     config:
+    #       bgp_as: 100
+    #       neighbors:
+    #       - neighbor: 192.0.2.10
+    #         peer_group: "peer1"
+    #         description: Leaf2Underlday
+    #     operation: merge
+
+    - name: Create a VLAN from a lopped list
+      arista.eos.eos_vlans:
         config:
-          bgp_as: 100
-          neighbors:
-          - neighbor: 192.0.2.10
-            peer_group: "peer1"
-            description: Leaf2Underlday
-        operation: merge
+          - vlan_id: "{{ item }}"
+            state: active
+        state: merged
+      loop: "{{ vlan_list }}"
+
+    - name: Create a VLAN from a lopped list a different way
+      arista.eos.eos_vlans:
+        config:
+          - vlan_id: "{{ item }}"
+            state: active
+        state: merged
+      loop: "{{ vlan_loop }}"

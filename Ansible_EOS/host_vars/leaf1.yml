@@ -18,6 +18,14 @@ VLANS:
   vlan10: 10
   vlan20: 20
 
+vlan_list:
+  - 60
+  - 70
+  - 80
+  - 90
+
 vlan_id: 50
 
 fuckwit: nelly
+
+vlan_loop: [501,601,701,801,901]
