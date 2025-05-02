@@ -1,0 +1,109 @@
+---
+
+- name: Test playbook for syntax experience
+  hosts: leaf1
+  tasks:
+    - name: Create a VLANs.
+      arista.eos.eos_vlans:
+        config:
+          - name: Internal
+            vlan_id: "{{ VLANS['vlan20'] }}"
+            state: active
+        state: merged
+
+    - name: Delete a vlan.
+      arista.eos.eos_vlans:
+        config:
+          - vlan_id: "{{ vlan_id }}"
+        state: deleted
+
+    - name: Change the hostname.
+      arista.eos.eos_hostname:
+        config:
+          hostname: "{{ HOSTNAMES[0]['neil'] }}"
+
+    - name: Create Ethernet1 and Ethernet2 as Layer3 Interfaces
+      arista.eos.eos_interfaces:
+        config:
+          - name: Ethernet1
+            enabled: true
+            mode: layer3
+          - name: Ethernet2
+            description: Configured by Ansible
+            enabled: true
+            mode: layer3
+        state: merged
+
+    - name: Add IP addresses on Ethernet1 and Ethernet2
+      arista.eos.eos_l3_interfaces:
+        config:
+          - name: Ethernet1
+            ipv4:
+              - address: 198.51.100.14/24
+          - name: Ethernet2
+            ipv4:
+              - address: 203.0.113.27/24
+        state: merged
+
+    - name: Create Prefix Lists
+      arista.eos.eos_prefix_lists:
+        config:
+          - afi: "ipv4"
+            prefix_lists:
+              - name: "prefix01"
+                entries:
+                  - sequence: 25
+                    action: "deny"
+                    address: "45.55.4.0/24"
+                  - sequence: 100
+                    action: "permit"
+                    address: "11.11.2.0/24"
+                    match:
+                      masklen: 32
+                      operator: "ge"
+              - name: "v402"
+                entries:
+                  - action: "deny"
+                    address: "10.1.1.0/24"
+                    sequence: 10
+                    match:
+                      masklen: 32
+                      operator: "ge"
+
+    - name: Create BGP Configuration
+      arista.eos.eos_bgp_global:
+        config:
+          as_number: "100"
+          bgp_params:
+            log_neighbor_changes: true
+          maximum_paths:
+            max_equal_cost_paths: 4
+            max_installed_ecmp_paths: 4
+          redistribute:
+            - protocol: "static"
+              route_map: "map_static"
+            - protocol: "attached-host"
+          distance:
+            internal: 200
+          neighbor:
+            - neighbor_address: "peer1"
+              remote_as: 2
+              maximum_received_routes:
+                count: 12000
+              next_hop_unchanged: true
+              send_community:
+                community_attribute: "extended"
+          network:
+            - address: "1.1.1.1/32"
+          router_id: 9.9.9.9
+        state: merged
+
+    - name: Configure BGP neighbors
+      arista.eos.eos_bgp:
+        config:
+          bgp_as: 100
+          neighbors:
+          - neighbor: 192.0.2.10
+            peer_group: "peer1"
+            description: Leaf2Underlday
+        operation: merge

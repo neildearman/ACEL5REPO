@@ -1,4 +1,23 @@
 ---
-water: wet
-sky: blue
-fire: hot
+
+gg:
+  - id: 10
+    name: DMZ
+    state: active
+  - id: 20
+    name: Internal
+    state: active
+  - id: leaf1
+
+HOSTNAMES: 
+  - neil: MAGA
+    paul: LAGA
+    mark: PAGA
+
+VLANS: 
+  vlan10: 10
+  vlan20: 20
+
+vlan_id: 50
+
+fuckwit: nelly
