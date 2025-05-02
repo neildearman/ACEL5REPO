@@ -11,19 +11,19 @@ import pyeapi
 
 import yaml
 
-file = open('vlans.yml','r')
-
-vlan_dict = yaml.safe_load(file)
+# file = open('vlans.yml','r')
+# vlan_dict = yaml.safe_load(file)
+# pyeapi.load_config('eapi.conf')
+# connect = pyeapi.connect_to('leaf1')
 
 pyeapi.load_config('eapi.conf')
 
 connect = pyeapi.connect_to('leaf1')
+vlan_api = connect.api('vlans')
 
-
-connect = pyeapi.connect_to('leaf1')
 cmd_result = connect.enable(['show mac-address-table'])
 
-print(cmd_result[0]['result'])
+# print(cmd_result[0]['result'])
 
 
 mac_table_set = set()

@@ -1,27 +1,27 @@
 import pyeapi
 import yaml
-import os
+
+file = open('vlans.yml','r')
+
+vlan_dict = yaml.safe_load(file)
 
 pyeapi.load_config('eapi.conf')
 
-file = open('switches.yml', 'r')
-switches_dict = yaml.safe_load(file)
-
-directory = 'configs'
-
-exists = os.path.exists(directory)
+# print(vlan_dict['vlans'][0]['name'])
 
 
-if exists == False:
-    os.mkdir(directory)
+# for switch in vlan_dict['switches']:
+#     print(f'Switch {switch} has the following VLANS:')
 
-for switch in switches_dict['devices']:
+#     for item in vlan_dict['vlans']:
+#         print(item['name'])
+
+for switch in vlan_dict['switches']:
     connect = pyeapi.connect_to(switch)
-    running_config = connect.get_config(as_string='True')
-    config_path = directory+'/'+switch+'.cfg'
-    file = open(config_path,'w')
-    file.write(running_config)
-    file.close()
-    print(f'Backed up {switch} to {config_path}')
-
-
+    print (f'Connecting to {switch}')
+    for vlan in vlan_dict['vlans']: 
+        vlan_id = vlan['id']
+        vlan_name = vlan['name']
+        print(f'Creating vlan {vlan_name}, with ID, {vlan_id}')
+        vlan_api.create(vlan_id)
+        vlan_api.set_name(vlan_id, vlan_name)
