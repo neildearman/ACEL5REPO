@@ -1,0 +1,12 @@
+---
+
+- name: Upload Jinja2 template to leaf 1
+  hosts: leaf1
+  tasks:
+    - name: load configuration from file
+      arista.eos.eos_config:
+        src: ../configs/ACE/leaf1.cfg
+
+    # - name: render a Jinja2 template onto an Arista switch
+    #   arista.eos.eos_config:
+    #     src: ../templates/leaf1.j2

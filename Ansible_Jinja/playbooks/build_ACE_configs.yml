@@ -1,0 +1,9 @@
+---
+- name: Build ACE configs from template
+  hosts: leaf1
+  tasks:
+    - name: Build from Jinja
+      ansible.builtin.template:
+        src: ../templates/leaf1.j2
+        dest: configs/ACE/{{ inventory_hostname }}.cfg
+        mode: '0644'
