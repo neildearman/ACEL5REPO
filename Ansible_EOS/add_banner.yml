@@ -1,0 +1,19 @@
+---
+
+- name: Test playbook for syntax experience
+  hosts: leaf1, leaf2
+  tasks:
+    - name: Remove the motd banner
+      arista.eos.eos_banner:
+        banner: motd
+        state: absent
+    
+    - name: configure the login banner
+      arista.eos.eos_banner:
+        banner: motd
+        text: "Welcome to the switch.
+        We hope you have a lovely day.
+        Peace out"
+        state: present
+
+

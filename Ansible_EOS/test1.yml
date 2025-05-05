@@ -7,6 +7,7 @@
       arista.eos.eos_vlans:
         config:
           - name: Internal
+            # This is a dict entry
             vlan_id: "{{ VLANS['vlan20'] }}"
             state: active
         state: merged
@@ -20,7 +21,8 @@
     - name: Change the hostname.
       arista.eos.eos_hostname:
         config:
-          hostname: "{{ HOSTNAMES[0]['neil'] }}"
+          # This is a list so need need to specific the list number (0)
+          hostname: "{{ devices[0] }}"
 
     - name: Create Ethernet1 and Ethernet2 as Layer3 Interfaces
       arista.eos.eos_interfaces:
@@ -108,7 +110,7 @@
     #         description: Leaf2Underlday
     #     operation: merge
 
-    - name: Create a VLAN from a lopped list
+    - name: Create a VLAN from a looped list
       arista.eos.eos_vlans:
         config:
           - vlan_id: "{{ item }}"
@@ -130,3 +132,18 @@
           - vlan_id: "{{ item }}"
         state: deleted
       loop: "{{ vlan_loop }}"
+
+    - name: Remove the motd banner
+      arista.eos.eos_banner:
+        banner: motd
+        state: absent
+    
+    - name: configure the login banner
+      arista.eos.eos_banner:
+        banner: motd
+        text: "Welcome to the switch
+        We hope you have a lovely day.
+        Peace out"
+        state: present
+
+

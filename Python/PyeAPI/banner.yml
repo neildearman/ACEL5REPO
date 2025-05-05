@@ -1,0 +1,19 @@
+---
+# This YAML file defines the configuration for network device banners.
+devices:
+  leaf1:
+    banners:
+      banner1:
+        type: login
+        text: "Welcome to Leaf 1"
+      banner2:
+        type: motd
+        text: "This is a message of the day for Leaf 1"
+  leaf2:
+    banners:
+      banner1:
+        type: exec
+        text: "This is an exec banner for Leaf 2"
+      banner2:
+        type: login
+        text: "Welcome to Leaf 2"

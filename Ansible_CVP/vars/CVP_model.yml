@@ -5,6 +5,7 @@ CVP_CONFIGLETS:
   Alias_test: "alias ship show ip interface brief"
   MLAG_Left: "{{ lookup('file','{{path}}/configlets/MLAG_Left.cfg') }}"
   MLAG_Right: "{{ lookup('file','{{path}}/configlets/MLAG_Right.cfg') }}"
+  banner: "{{ lookup('file','{{path}}/configlets/banner.cfg') }}"
 
 CVP_CONTAINERS:
   DC1:
@@ -59,3 +60,11 @@ CVP_DEVICES_DEFAULT:
     configlets:
       - 'ATD-INFRA'
       - 'leaf4-base'
+
+CVP_DEVICES_BANNER:
+  - fqdn: 'leaf1'
+    parentContainerName: 'Leaf'
+    configlets:
+      - 'ATD-INFRA'
+      - 'leaf1-base'
+      - 'banner'

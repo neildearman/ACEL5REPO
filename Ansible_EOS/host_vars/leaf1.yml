@@ -9,23 +9,35 @@ gg:
     state: active
   - id: leaf1
 
+# This is a dictionary containing a list of dictionaries
 HOSTNAMES: 
+# List 0 
   - neil: MAGA
     paul: LAGA
-    mark: PAGA
+# List1 
+  - mark: PAGA
 
 VLANS: 
   vlan10: 10
   vlan20: 20
 
+# This is a list 
 vlan_list:
   - 60
   - 70
   - 80
   - 90
 
+# This is a single variable which is an integer - no quote marks
 vlan_id: 50
 
+# This is a single variable of type string
 fuckwit: nelly
 
+# This is a list 
 vlan_loop: [501,601,701,801,901]
+
+# This is a dictionary containing a multiple lists - so need to call [devices][1] for the second one 
+devices:
+  - leaf1
+  - leaf2

@@ -1,0 +1,10 @@
+---
+- name: Build configs from template
+  hosts: leaf1, leaf2
+  tasks:
+    - name: Build from Jinja
+      ansible.builtin.template:
+        src: ../templates/banner.j2
+        dest: configs/{{ inventory_hostname }}.banner.cfg
+        mode: '0644'
+
