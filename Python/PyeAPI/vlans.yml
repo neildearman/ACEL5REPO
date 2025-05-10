@@ -10,15 +10,15 @@ vlans:
     name: QA
   - id: 50
     name: Guest
-switches:
-  leaf1:
-    staticroutes:
-      - destination: 0.0.0.0/0
-        next_hop: 1.1.1.1
-  leaf2:
-    staticroutes:
-      - destination: 0.0.0.0/0
-        next_hop: 1.1.1.1
+# switches:
+#   leaf1:
+#     staticroutes:
+#       - destination: 0.0.0.0/0
+#         next_hop: 1.1.1.1
+#   leaf2:
+#     staticroutes:
+#       - destination: 0.0.0.0/0
+#         next_hop: 1.1.1.1
   # leaf3:
   # - leaf4
   # - spine1
@@ -28,4 +28,15 @@ switches:
   # - borderleaf1
   # - borderleaf2
 
+switches:
+  - leaf1
+  - leaf2
+  - leaf3
+  - leaf4
+  # - spine1
+  # - spine2
+  # - spine3
+  # - spine4
+  # - borderleaf1
+  # - borderleaf2
   
