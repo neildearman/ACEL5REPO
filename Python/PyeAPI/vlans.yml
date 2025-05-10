@@ -13,11 +13,11 @@ vlans:
 switches:
   leaf1:
     staticroutes:
-      - destination: 0.0.0.0
+      - destination: 0.0.0.0/0
         next_hop: 1.1.1.1
   leaf2:
     staticroutes:
-      - destination: 0.0.0.0
+      - destination: 0.0.0.0/0
         next_hop: 1.1.1.1
   # leaf3:
   # - leaf4
