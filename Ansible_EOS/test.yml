@@ -5,7 +5,7 @@
   vars_files:
     - group_vars/neil.yml
   tasks:
-    - name: load an acl into the device
+    - name: Add a banner to Leaf1 
       arista.eos.eos_config:
         lines:
           - hostname NEIL
@@ -13,4 +13,4 @@
           - banner motd
           - Hello_world1
           - EOF
-        replace: line
+        replace: block
