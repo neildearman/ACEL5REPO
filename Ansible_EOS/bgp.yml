@@ -28,5 +28,5 @@
               route_target:
                 mode: "export"
                 target: "33:11"
-              vrf: "vrft"
+              vrf: "VRF_A"
         state: merged

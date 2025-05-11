@@ -12,6 +12,9 @@ CVP_CONTAINERS:
     parentContainerName: Tenant
   DC2:
     parentContainerName: Tenant
+  SuperSpine:
+    parentContainerName: DC2
+  
 
 CVP_DEVICES_MLAG:
   - fqdn: 'leaf1'
@@ -67,4 +70,12 @@ CVP_DEVICES_BANNER:
     configlets:
       - 'ATD-INFRA'
       - 'leaf1-base'
+      - 'banner'
+
+CVP_DEVICES_BL:
+  - fqdn: 'borderleaf1'
+    parentContainerName: 'Borderleaf'
+    configlets:
+      - 'ATD-INFRA'
+      - 'borderleaf1-base'
       - 'banner'

@@ -4,55 +4,232 @@
   gather_facts: false
 
   tasks:
-    - name: Create or update BGP Peer Group
+
+    - name: Delete running config for provided afi
+      arista.eos.eos_bgp_address_family:
+        config:
+          address_family:
+            - afi: ipv4
+            - afi: ipv6
+              vrf: vrft
+          as_number: "65201"
+        state: deleted
+
+    - name: Delete existing BGP configuration from device
       arista.eos.eos_bgp_global:
         config:
-          - peer_group:
-              name: "my_peer_group"
-              address: "192.168.1.1/32"  # Example address for the peer group
-              as_number: "65001"  # Example remote AS number
-              log_neighbor_changes: true
-            # Add any other peer group attributes here, as needed.
+          as_number: "65201"
+        state: deleted
+
+# Create the following global parameters
+
+# router-id 172.16.0.71
+# bgp log-neighbor-changes - This is by default
+# no bgp default ipv4 - Can't seem to change this one
+# maximum-paths 4 ecmp 4
+# distance bgp 20 200 200
+
+    - name: Configure BGP Global Settings
+      arista.eos.eos_bgp_global:
+        config:
+          as_number: 65201
+          router_id: 172.16.0.71
+          bgp_params:
+            log_neighbor_changes: true
+          maximum_paths:
+            max_equal_cost_paths: 4
+            max_installed_ecmp_paths: 4
+          distance:
+            internal: 200
+            external: 20
+            local: 200
         state: merged
 
-  # tasks:
-  #   - name: Configure BGP Global Settings with Peer Group
-  #     arista.eos.eos_bgp_global:
-  #       config:
-  #         as_number: 65201
-  #         router_id: 1.1.1.1
-  #         maximum_paths:
-  #           max_equal_cost_paths: 4
-  #           max_installed_ecmp_paths: 4
-  #       state: merged
+# Create a Leaf 2 Underlay Neighbor
+#    neighbor 172.16.253.2 remote-as 65201
+#    neighbor 172.16.253.2 next-hop-self
+#    neighbor 172.16.253.2 description Leaf2Underlay
 
-    # - name: Configure BGP Neighbor and assign to Peer Group
-    #   arista.eos.eos_bgp_address_family:
-    #     config:
-    #       address_family:
-    #         - afi: "ipv4"
-    #           neighbor:
-    #             - peer: SpineUnderlay
-    #               activate: true
-    #           network:
-    #           - address: "1.1.1.0/24"
-    #           - address: "1.5.1.0/24"
+    - name: Configure Leaf 2 Underlay
+      arista.eos.eos_bgp_global:
+        config:
+          as_number: 65201
+          neighbor:
+            - remote_as: 65200
+              neighbor_address: 172.16.253.2
+              description: Leaf2Underlay
+              maximum_received_routes:
+                count: 12000
+              next_hop_self: true
+        state: merged
+
+# Create a SpinesUnderlay peer group with parameters 
+#    neighbor SpinesUnderlay peer group
+#    neighbor SpinesUnderlay remote-as 65200
+#    neighbor SpinesUnderlay maximum-routes 12000
+
+    - name: Configure SpinesUnderlay Peer Group
+      arista.eos.eos_bgp_global:
+        config:
+          as_number: 65201
+          neighbor:
+            - remote_as: 65200
+              neighbor_address: SpinesUnderlay
+              maximum_received_routes:
+                count: 12000
+        state: merged
+
+# Associate neighbors to the peer group and add descriptions
+#    neighbor 10.10.1.1 peer group SpinesUnderlay
+#    neighbor 10.10.2.1 peer group SpinesUnderlay
+#    neighbor 10.10.3.1 peer group SpinesUnderlay
+#    neighbor 10.10.4.1 peer group SpinesUnderlay
+#    neighbor 10.10.1.1 desc Spine1Underlay
+#    neighbor 10.10.2.1 desc Spine2Underlay
+#    neighbor 10.10.3.1 desc Spine3Underlay
+#    neighbor 10.10.4.1 desc Spine4Underlay
+
+    - name: Configure BGP with Peer-Group for all switches
+      arista.eos.eos_config:
+        lines:
+          - neighbor 10.10.1.1 peer group SpinesUnderlay
+          - neighbor 10.10.2.1 peer group SpinesUnderlay
+          - neighbor 10.10.3.1 peer group SpinesUnderlay
+          - neighbor 10.10.4.1 peer group SpinesUnderlay
+          - neighbor 10.10.1.1 description Spine1Underlay
+          - neighbor 10.10.2.1 description Spine2Underlay
+          - neighbor 10.10.3.1 description Spine3Underlay
+          - neighbor 10.10.4.1 description Spine4Underlay
+        parents: router bgp 65201
+        save_when: modified
+
+# Create the IPv4 Address family and activate the neighbors and set the network statements
+
+    - name: Configure Peer Group and IPV4 Address Family
+      arista.eos.eos_bgp_address_family:
+        config:
+          as_number: 65201
+          address_family:
+            - afi: "ipv4"
+              neighbor:
+                - peer: 172.16.253.2
+                  activate: true
+                - peer: SpinesUnderlay
+                  activate: true
+              network:
+                - address: "172.16.0.71/32"
+                - address: "172.16.1.70/32"
+        state: merged
+
+# Create the overlay configuration
+# router bgp 65201
+#    neighbor SpinesOverlay peer group
+#    neighbor SpinesOverlay remote-as 65200
+#    neighbor SpinesOverlay update-source Loopback0
+#    neighbor SpinesOverlay ebgp-multihop 3
+#    neighbor SpinesOverlay send-community extended
+#    neighbor SpinesOverlay maximum-routes 0
+
+    - name: Configure SpinesOverlay Peer Group
+      arista.eos.eos_bgp_global:
+        config:
+          as_number: 65201
+          neighbor:
+            - remote_as: 65200
+              neighbor_address: SpinesOverlay
+              maximum_received_routes:
+                count: 0
+              send_community:
+                set: true
+                community_attribute: extended
+              # ebgp_multihop:
+              #   set: true
+              update_source: Loopback0
+        state: merged
+
+# Create the Overlay neighbor to peer goup statements
+#    neighbor 172.16.0.101 peer group SpinesOverlay
+#    neighbor 172.16.0.102 peer group SpinesOverlay
+#    neighbor 172.16.0.103 peer group SpinesOverlay
+#    neighbor 172.16.0.104 peer group SpinesOverlay
+# !
+#    neighbor 172.16.0.101 desc Spine1Overlay
+#    neighbor 172.16.0.102 desc Spine2Overlay
+#    neighbor 172.16.0.103 desc Spine3Overlay
+#    neighbor 172.16.0.104 desc Spine4Overlay
+
+    - name: Configure BGP with Overlay Peer-Group for all switches
+      arista.eos.eos_config:
+        lines:
+          - neighbor 172.16.0.101 peer group SpinesOverlay
+          - neighbor 172.16.0.102 peer group SpinesOverlay
+          - neighbor 172.16.0.103 peer group SpinesOverlay
+          - neighbor 172.16.0.104 peer group SpinesOverlay
+          - neighbor 172.16.0.101 description Spine1Overlay
+          - neighbor 172.16.0.102 description Spine2Overlay
+          - neighbor 172.16.0.103 description Spine3Overlay
+          - neighbor 172.16.0.104 description Spine4Overlay
+        parents: router bgp 65201
+        save_when: modified
+
+# Create the EVPN Address family and activate the neighbors and set the network statements
+
+    - name: Configure Peer Group and EVPN Address Family
+      arista.eos.eos_bgp_address_family:
+        config:
+          as_number: 65201
+          address_family:
+            - afi: "evpn"
+              neighbor:
+                - peer: SpinesOverlay
+                  activate: true
+        state: merged
 
 
+# Create the VRF and Vlans under the evpn address family
+# address-family evpn
+#  vrf VRF-A
+#       rd 172.16.0.71:5050
+#       route-target import evpn 5050:5050
+#       route-target export evpn 5050:5050
+   
+#  vlan 10
+#       rd 172.16.0.71:1010
+#       route-target both 1010:1010
+#  redistribute learned
+# !
+#  vlan 20
+#       rd 172.16.0.71:2020
+#       route-target both 2020:2020
+#   redistribute learned
+# !
+#  vlan 30
+#       rd 172.16.0.71:3030
+#       route-target both 3030:3030
+# redistribute learned
+# !
+#  vlan 40
+#       rd 172.16.0.71:4040
+#       route-target both 4040:4040
+#  redistribute learned
+# !
+#  vlan 67
+#       rd 172.16.0.71:6767
+#       route-target both 6767:6767
+
+    - name: Configure evpn address family route targets and VRFs
+      arista.eos.eos_bgp_address_family:
+          config:
+            as_number: "65201"
+            address_family:
+              - afi: evpn
+                route_target:
+                  mode: "export"
+                  target: 5050:5050
+                vrf: "VRF_A"
+          state: merged  
 
 
-    #         - neighbor_address: 10.0.12.2
-    #           peer_group: SpineUnderlay
-    #           description: "Spine1Underlay"
-    #           remote_as: 65200
-    #           description: "Peer group for Spine switches"
-    #           address_family:
-    #             - afi: ipv4
-    #               safi: unicast
-    #               activate: true
-    #               route_map_in: IMPORT_POLICY
-    #               route_map_out: EXPORT_POLICY
-    #     state: merged
 
     # - name: Configure Route Maps
     #   eos_config:
@@ -67,3 +244,6 @@
     #     lines:
     #       - ip prefix-list PL_IMPORT seq 10 permit 192.168.0.0/16
     #       - ip prefix-list PL_EXPORT seq 10 permit 10.0.0.0/8
+
+
+   
