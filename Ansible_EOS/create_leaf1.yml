@@ -9,6 +9,8 @@
         config:
           # This is a list so need need to specific the list number (0)
           hostname: "{{ devices[0] }}"
+        state: merged
+
 
 #  Create the L3 interfaces
 # !Leaf 1 Interface IP addresses
@@ -105,6 +107,19 @@
                 virtual: true 
         state: merged
 
+#  Create the VRF_A VRF
+    - name: Create vrf VRF_A
+      arista.eos.eos_vrf:
+        name: VRF_A
+        interfaces:
+          - vlan10
+          - vlan20
+          - vlan30
+          - vlan40
+          - vlan67
+        rd: 172.16.0.71:5050
+        state: present
+
 # Add the virtual-router address and VRF association to the vlan interfaces
 
     - name: VRF and virtual router on vlan10 interface
@@ -143,7 +158,7 @@
           - vrf VRF_A
         parents: interface vlan 67
         save_when: modified
-        
+
 # Reapply IP addresses on vlan interfaces after VRF has been applied
     - name: Add IP addresses on VLAN Interfaces
       arista.eos.eos_l3_interfaces:
@@ -183,6 +198,38 @@
             state: active
         state: merged
       loop: "{{ vlan_list }}"
+
+
+# Create the Etherchannel interfaces
+
+    - name: Merge provided LAG attributes with existing device configuration
+      arista.eos.eos_lag_interfaces:
+        config:
+          - name: 10
+            members:
+              - member: Ethernet7
+                mode: active
+          - name: 20
+            members:
+              - member: Ethernet9
+                mode: active
+        state: merged
+
+#  Add MLAG to port channel10 interface
+    - name: Configure MLAG on Port Channel10 Interfaces
+      arista.eos.eos_config:
+        lines:
+          - mlag1
+        parents: interface port-channel10
+        save_when: modified
+
+#  Add MLAG to port channel20 interface
+    - name: Configure MLAG on Port Channel20 Interface
+      arista.eos.eos_config:
+        lines:
+          - mlag2
+        parents: interface port-channel20
+        save_when: modified
 
 # Create the prefix list 
 # ip prefix-list BLLOOP seq 10 permit 172.16.0.101/32
