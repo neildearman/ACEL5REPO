@@ -54,28 +54,120 @@
             mode: layer3
         state: merged
 
-    - name: Add IP addresses on Interfaces
+# Create L3 VLAN interfaces
+# int vlan 10
+# no autostate
+# vrf VRF-A
+# ip address 172.17.10.251/24
+# ip virtual-router address 172.17.10.254/24
+# !
+# int vlan 20
+# no autostate
+# vrf VRF-A
+# ip address 172.17.20.251/24
+# ip virtual-router address 172.17.20.254/24
+# !
+# int vlan 30
+# no autostate
+# vrf VRF-A
+# ip address virtual 172.17.30.254/24
+# !
+# int vlan 40
+# no autostate
+# vrf VRF-A
+# ip address virtual 172.17.40.254/24
+# !
+# int vlan 67
+# no autostate
+# vrf VRF-A
+# ip address virtual 67.76.96.254/24
+# !
+    - name: Add IP addresses on VLAN Interfaces
       arista.eos.eos_l3_interfaces:
         config:
-          - name: Ethernet3
+          - name: vlan10
             ipv4:
-              - address: 10.10.1.2/30
-          - name: Ethernet4
+              - address: 172.17.10.251/24
+          - name: vlan20
             ipv4:
-              - address: 10.10.2.2/30
-          - name: Ethernet5
+              - address: 172.17.20.251/24
+          - name: vlan30
             ipv4:
-              - address: 10.10.3.2/30
-          - name: Ethernet6
+              - address: 172.17.30.254/24
+                virtual: true
+          - name: vlan40
             ipv4:
-              - address: 10.10.4.2/30
-          - name: Loopback0
+              - address: 172.17.40.254/24
+                virtual: true
+          - name: vlan67
             ipv4:
-              - address: 172.16.0.71/32
-          - name: Loopback1
-            ipv4:
-              - address: ip add 172.16.1.70/32
+              - address: 67.76.96.254/24
+                virtual: true 
         state: merged
+
+# Add the virtual-router address and VRF association to the vlan interfaces
+
+    - name: VRF and virtual router on vlan10 interface
+      arista.eos.eos_config:
+        lines:
+          - vrf VRF_A
+          - ip virtual-router address 172.17.10.254/24
+        parents: interface vlan 10
+        save_when: modified
+
+    - name: VRF and virtual router on vlan20 interface
+      arista.eos.eos_config:
+        lines:
+          - vrf VRF_A
+          - ip virtual-router address 172.17.20.254/24
+        parents: interface vlan 20
+        save_when: modified
+
+    - name: VRF on vlan30 interface
+      arista.eos.eos_config:
+        lines:
+          - vrf VRF_A
+        parents: interface vlan 30
+        save_when: modified
+
+    - name: VRF on vlan40 interface
+      arista.eos.eos_config:
+        lines:
+          - vrf VRF_A
+        parents: interface vlan 40
+        save_when: modified
+
+    - name: VRF on vlan67 interface
+      arista.eos.eos_config:
+        lines:
+          - vrf VRF_A
+        parents: interface vlan 67
+        save_when: modified
+        
+# Reapply IP addresses on vlan interfaces after VRF has been applied
+    - name: Add IP addresses on VLAN Interfaces
+      arista.eos.eos_l3_interfaces:
+        config:
+          - name: vlan10
+            ipv4:
+              - address: 172.17.10.251/24
+          - name: vlan20
+            ipv4:
+              - address: 172.17.20.251/24
+          - name: vlan30
+            ipv4:
+              - address: 172.17.30.254/24
+                virtual: true
+          - name: vlan40
+            ipv4:
+              - address: 172.17.40.254/24
+                virtual: true
+          - name: vlan67
+            ipv4:
+              - address: 67.76.96.254/24
+                virtual: true 
+        state: merged
+
 
 # Create the vlans
 # vlan 10
