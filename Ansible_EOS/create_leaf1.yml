@@ -308,12 +308,9 @@
               - address: 172.16.255.1/30
         state: merged
 
-
-
-
 # Create the Etherchannel interfaces
 
-    - name: Merge provided LAG attributes with existing device configuration
+    - name: Create the Port Channels
       arista.eos.eos_lag_interfaces:
         config:
           - name: 10
