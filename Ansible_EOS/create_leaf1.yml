@@ -59,12 +59,12 @@
           - name: Ethernet6
             enabled: true
             mode: layer3
-          - name: Loopback0
-            enabled: true
-            mode: layer3
-          - name: Loopback1
-            enabled: true
-            mode: layer3
+          # - name: Loopback0
+          #   enabled: true
+          #   mode: layer3
+          # - name: Loopback1
+          #   enabled: true
+          #   mode: layer3
         state: merged
 
 # Create L3 VLAN interfaces
@@ -116,6 +116,18 @@
             ipv4:
               - address: 67.76.96.254/24
                 virtual: true 
+         - name: Ethernet3
+            ipv4:
+              - address: 10.10.1.2/30
+         - name: Ethernet4
+            ipv4:
+              - address: 10.10.2.2/30
+         - name: Ethernet5
+            ipv4:
+              - address: 10.10.3.2/30
+         - name: Ethernet6
+            ipv4:
+              - address: 10.10.4.2/30 
         state: merged
 
 #  Create the VRF_A VRF
@@ -172,8 +184,8 @@
     - name: Add trunk group to interface
       arista.eos.eos_config:
         lines:
-          - switch trunk group MLAGVLAN
-        parents: interface portchannel100
+          - interface port-channel 100
+          - switchport trunk group MLAGVLAN
         save_when: modified
 
 
@@ -300,16 +312,16 @@
     - name: Configure MLAG on Port Channel10 Interfaces
       arista.eos.eos_config:
         lines:
-          - mlag1
-        parents: interface port-channel10
+          - interface port-channel 10
+          - mlag 1
         save_when: modified
 
 #  Add MLAG to port channel20 interface
     - name: Configure MLAG on Port Channel20 Interface
       arista.eos.eos_config:
         lines:
-          - mlag2
-        parents: interface port-channel20
+          - interface port-channel 20
+          - mlag 2
         save_when: modified
 
 # Create Po10 and Po20 as layer-2 access interfaces
@@ -317,11 +329,11 @@
     - name: Create Po10 and Po20 Layer 2 Interfaces
       arista.eos.eos_l2_interfaces:
         config:
-          - name: PortChannel10
+          - name: Port-Channel 10
             access:
               vlan: 10
             mode: access
-          - name: PortChannel20
+          - name: Port-Channel 20
             access:
               vlan: 20
             mode: access
