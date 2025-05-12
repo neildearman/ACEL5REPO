@@ -128,7 +128,7 @@
           - name: vlan67
             ipv4:
               - address: 67.76.96.254/24
-                virtual: true 
+                virtual: true
           - name: Ethernet3
             ipv4:
               - address: 10.10.1.2/30
@@ -140,7 +140,7 @@
               - address: 10.10.3.2/30
           - name: Ethernet6
             ipv4:
-              - address: 10.10.4.2/30 
+              - address: 10.10.4.2/30
           - name: Loopback0
             ipv4:
               - address: 172.16.0.71/32
@@ -167,7 +167,7 @@
           - no autostate
         save_when: modified
 
-# Set spanning-tree mode mstp 
+# Set spanning-tree mode mstp
     - name: Set spanning-tree mode mstp
       arista.eos.eos_config:
         lines:
@@ -299,7 +299,7 @@
           - name: vlan67
             ipv4:
               - address: 67.76.96.254/24
-                virtual: true 
+                virtual: true
           - name: vlan4093
             ipv4:
               - address: 172.16.253.1/30
@@ -372,7 +372,7 @@
             mode: access
         state: merged
 
-# Create the prefix list 
+# Create the prefix list
 # ip prefix-list BLLOOP seq 10 permit 172.16.0.101/32
 
     - name: Create Prefix Lists
@@ -393,7 +393,7 @@
 # route-map WEIGHT permit 20
 
     - name: Configure Route Maps
-      eos_config:
+      arista.eos.eos_config:
         lines:
           - route-map WEIGHT permit 10
           - match ip address prefix-list BLLOOP
@@ -486,7 +486,7 @@
               next_hop_self: true
         state: merged
 
-# Create a SpinesUnderlay peer group with parameters 
+# Create a SpinesUnderlay peer group with parameters
 #    neighbor SpinesUnderlay peer group
 #    neighbor SpinesUnderlay remote-as 65200
 #    neighbor SpinesUnderlay maximum-routes 12000
@@ -642,7 +642,7 @@
     - name: Configure BGP with Overlay Peer-Group for all switches
       arista.eos.eos_config:
         lines:
-          - address-family evpn 
+          - address-family evpn
           - vrf VRF-A
           - rd 172.16.0.71:5050
           - route-target import evpn 5050:5050
@@ -679,4 +679,4 @@
     #               mode: "export"
     #               target: 5050:5050
     #             vrf: "VRF_A"
-    #       state: merged  
+    #       state: merged
