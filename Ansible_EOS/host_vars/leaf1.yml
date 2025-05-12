@@ -28,6 +28,8 @@ vlan_list:
   - 30
   - 40
   - 67
+  - 4093
+  - 4094
 
 # This is a single variable which is an integer - no quote marks
 vlan_id: 50

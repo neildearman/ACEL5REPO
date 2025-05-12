@@ -12,6 +12,17 @@
         state: merged
 
 
+# ip routing
+# ip virtual-router mac-address 001c.7300.0099
+
+#  Enable IP routing and set virtual mac address for later
+    - name: Enable IP routing and set virtual mac address for later
+      arista.eos.eos_config:
+        lines:
+          - ip routing
+          - ip virtual-router mac-address 001c.7300.0099
+        save_when: modified
+
 #  Create the L3 interfaces
 # !Leaf 1 Interface IP addresses
 # int lo0
@@ -120,6 +131,52 @@
         rd: 172.16.0.71:5050
         state: present
 
+# Enable vlan trunk group
+# vlan 4094
+# trunk group MLAGVLAN
+
+#  Enable IP routing and set virtual mac address for later
+    - name: Enable IP routing and set virtual mac address for later
+      arista.eos.eos_config:
+        lines:
+          - trunk group MLAGVLAN
+        parents: vlan 4094
+        save_when: modified
+
+
+# int po100
+# switch mode trunk
+# switch trunk group MLAGVLAN
+# desc MLAG Peer Link
+
+# Create the MLAG Port Channel interface
+    - name: Create the MLAG Port Channel 100 Interface
+      arista.eos.eos_lag_interfaces:
+        config:
+          - name: 100
+            members:
+              - member: Ethernet1, Ethernet2
+                mode: active
+        state: merged
+
+# Create Po100 as layer-2 trunk interface
+
+    - name: Create Po100 as trunk interface
+      arista.eos.eos_l2_interfaces:
+        config:
+          - name: PortChannel100
+            mode: trunk
+        state: merged
+
+#  Add trunk group to interface
+    - name: Add trunk group to interface
+      arista.eos.eos_config:
+        lines:
+          - switch trunk group MLAGVLAN
+        parents: interface portchannel100
+        save_when: modified
+
+
 # Add the virtual-router address and VRF association to the vlan interfaces
 
     - name: VRF and virtual router on vlan10 interface
@@ -181,6 +238,12 @@
             ipv4:
               - address: 67.76.96.254/24
                 virtual: true 
+          - name: vlan4093
+            ipv4:
+              - address: 172.16.253.1/30
+          - name: vlan4094
+            ipv4:
+              - address: 172.16.255.1/30
         state: merged
 
 
@@ -215,6 +278,24 @@
                 mode: active
         state: merged
 
+# Create the MLAG Configuration
+# mlag configuration
+# domain-id MLAGDomainLeaf1Leaf2
+# local-interface vlan 4094
+# peer-link po100
+# peer-address 172.16.255.2
+
+#  Add MLAG to port channel10 interface
+    - name: Create the MLAG configuration
+      arista.eos.eos_config:
+        lines:
+          - mlag configuration
+          - domain-id MLAGDomainLeaf1Leaf2
+          - local-interface vlan 4094
+          - peer-link po100
+          - peer-address 172.16.255.2
+        save_when: modified
+
 #  Add MLAG to port channel10 interface
     - name: Configure MLAG on Port Channel10 Interfaces
       arista.eos.eos_config:
@@ -230,6 +311,21 @@
           - mlag2
         parents: interface port-channel20
         save_when: modified
+
+# Create Po10 and Po20 as layer-2 access interfaces
+
+    - name: Create Po10 and Po20 Layer 2 Interfaces
+      arista.eos.eos_l2_interfaces:
+        config:
+          - name: PortChannel10
+            access:
+              vlan: 10
+            mode: access
+          - name: PortChannel20
+            access:
+              vlan: 20
+            mode: access
+        state: merged
 
 # Create the prefix list 
 # ip prefix-list BLLOOP seq 10 permit 172.16.0.101/32
