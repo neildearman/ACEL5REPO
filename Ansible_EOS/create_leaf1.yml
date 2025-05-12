@@ -59,12 +59,10 @@
           - name: Ethernet6
             enabled: true
             mode: layer3
-          # - name: Loopback0
-          #   enabled: true
-          #   mode: layer3
-          # - name: Loopback1
-          #   enabled: true
-          #   mode: layer3
+          - name: Loopback0
+            enabled: true
+          - name: Loopback1
+            enabled: true
         state: merged
 
 # Create L3 VLAN interfaces
@@ -116,18 +114,24 @@
             ipv4:
               - address: 67.76.96.254/24
                 virtual: true 
-         - name: Ethernet3
+          - name: Ethernet3
             ipv4:
               - address: 10.10.1.2/30
-         - name: Ethernet4
+          - name: Ethernet4
             ipv4:
               - address: 10.10.2.2/30
-         - name: Ethernet5
+          - name: Ethernet5
             ipv4:
               - address: 10.10.3.2/30
-         - name: Ethernet6
+          - name: Ethernet6
             ipv4:
               - address: 10.10.4.2/30 
+          - name: Loopback0
+            ipv4:
+              - address: 172.16.0.71/32
+          - name: Loopback1
+            ipv4:
+              - address: 172.16.1.70/32
         state: merged
 
 #  Create the VRF_A VRF
@@ -142,6 +146,13 @@
           - vlan67
         rd: 172.16.0.71:5050
         state: present
+
+#  Enable IP routing on VRF_A
+    - name: Enable IP routing on VRF_A
+      arista.eos.eos_config:
+        lines:
+          - ip routing vrf VRF_A
+        save_when: modified
 
 # Enable vlan trunk group
 # vlan 4094
@@ -581,25 +592,14 @@
 #       rd 172.16.0.71:6767
 #       route-target both 6767:6767
 
-    - name: Configure evpn address family route targets and VRFs
-      arista.eos.eos_bgp_address_family:
-          config:
-            as_number: "65201"
-            address_family:
-              - afi: evpn
-                route_target:
-                  mode: "export"
-                  target: 5050:5050
-                vrf: "VRF_A"
-          state: merged  
-
-
-
-
-
-     
-
-
-
-
-
+    # - name: Configure evpn address family route targets and VRFs
+    #   arista.eos.eos_bgp_address_family:
+    #       config:
+    #         as_number: "65201"
+    #         address_family:
+    #           - afi: evpn
+    #             route_target:
+    #               mode: "export"
+    #               target: 5050:5050
+    #             vrf: "VRF_A"
+    #       state: merged  
