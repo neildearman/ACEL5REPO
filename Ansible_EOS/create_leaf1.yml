@@ -23,6 +23,21 @@
           - ip virtual-router mac-address 001c.7300.0099
         save_when: modified
 
+# Create the vlans
+# vlan 10
+# vlan 20
+# vlan 30
+# vlan 40
+# vlan 67
+
+    - name: Create the required VLANs from a looped list
+      arista.eos.eos_vlans:
+        config:
+          - vlan_id: "{{ item }}"
+            state: active
+        state: merged
+      loop: "{{ vlan_list }}"
+
 #  Create the L3 interfaces
 # !Leaf 1 Interface IP addresses
 # int lo0
@@ -133,6 +148,31 @@
             ipv4:
               - address: 172.16.1.70/32
         state: merged
+
+# Set no autostate for vlan interfaces
+    - name: Set no auto-tate for vlan interfaces
+      arista.eos.eos_config:
+        lines:
+          - interface vlan 10
+          - no autostate
+          - interface vlan 20
+          - no autostate
+          - interface vlan 30
+          - no autostate
+          - interface vlan 40
+          - no autostate
+          - interface vlan 67
+          - no autostate
+          - interface vlan 4093
+          - no autostate
+        save_when: modified
+
+# Set spanning-tree mode mstp 
+    - name: Set spanning-tree mode mstp
+      arista.eos.eos_config:
+        lines:
+          - spanning-tree mst 0 root primary
+        save_when: modified
 
 #  Create the VRF_A VRF
     - name: Create vrf VRF_A
@@ -270,20 +310,6 @@
         state: merged
 
 
-# Create the vlans
-# vlan 10
-# vlan 20
-# vlan 30
-# vlan 40
-# vlan 67
-
-    - name: Create the required VLANs from a looped list
-      arista.eos.eos_vlans:
-        config:
-          - vlan_id: "{{ item }}"
-            state: active
-        state: merged
-      loop: "{{ vlan_list }}"
 
 
 # Create the Etherchannel interfaces
@@ -377,6 +403,32 @@
           - match ip address prefix-list BLLOOP
           - set weight 1
           - route-map WEIGHT permit 20
+
+
+#  Create VXLAN interface and config
+# int vxlan 1
+# vxlan source-interface lo1
+# vxlan vlan 10 vni 1010
+# vxlan vlan 20 vni 2020
+# vxlan vlan 30 vni 3030
+# vxlan vlan 40 vni 4040
+# vxlan vlan 67 vni 6767
+# vxlan vrf VRF-A vni 5050
+# vxlan virtual-router encapsulation mac-address 001c.7300.0099
+
+    - name: Create VXLAN config
+      arista.eos.eos_config:
+        lines:
+          - interface vxlan 1
+          - vxlan source-interface loopback1
+          - vxlan vlan 10 vni 1010
+          - vxlan vlan 20 vni 2020
+          - vxlan vlan 30 vni 3030
+          - vxlan vlan 40 vni 4040
+          - vxlan vlan 67 vni 6767
+          - vxlan vrf VRF-A vni 5050
+          - vxlan virtual-router encapsulation mac-address 001c.7300.0099
+        save_when: modified
 
 # Remove any BGP configuration
 
