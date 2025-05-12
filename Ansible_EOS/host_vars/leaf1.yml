@@ -2,7 +2,7 @@
 
 gg:
   - id: 10
-    name: DMZ
+    name: 
     state: active
   - id: 20
     name: Internal
@@ -23,10 +23,11 @@ VLANS:
 
 # This is a list 
 vlan_list:
-  - 60
-  - 70
-  - 80
-  - 90
+  - 10
+  - 20
+  - 30
+  - 40
+  - 67
 
 # This is a single variable which is an integer - no quote marks
 vlan_id: 50

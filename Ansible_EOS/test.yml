@@ -1,6 +1,6 @@
 ---
 
-- name: Test playbook for syntax experience
+- name: Recreate the Leaf1 Config Playbook
   hosts: leaf1
   vars_files:
     - group_vars/neil.yml
