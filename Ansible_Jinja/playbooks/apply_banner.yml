@@ -9,4 +9,4 @@
 
     - name: render a Jinja2 template onto an Arista switch
       arista.eos.eos_config:
-        src: ../configs/{{inventory_hostname}}.banner.cfg
+        src: ../templates/banner.j2
