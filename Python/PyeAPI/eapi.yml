@@ -9,3 +9,8 @@ switches:
     transport: https
     username: arista
     password: aristapghp
+  - name: leaf1
+    host: 192.168.0.21
+    transport: https
+    username: arista
+    password: aristapghp
