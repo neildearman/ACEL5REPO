@@ -1,0 +1,39 @@
+anta_inventory:
+  hosts:
+    - host: 192.168.0.21
+      name: leaf1
+      tags: ['fabric', 'leaf']
+    - host: 192.168.0.22
+      name: leaf2
+      tags: ['fabric', 'leaf']
+    - host: 192.168.0.23
+      name: leaf3
+      tags: ['fabric', 'leaf']
+    - host: 192.168.0.24
+      name: leaf4
+      tags: ['fabric', 'leaf']
+    - host: 192.168.0.11
+      name: spine1
+      tags: ['fabric', 'spine']
+    - host: 192.168.0.12
+      name: spine2
+      tags: ['fabric', 'spine']
+    - host: 192.168.0.13
+      name: spine3
+      tags: ['fabric', 'spine']
+    - host: 192.168.0.14
+      name: spine4
+      tags: ['fabric', 'spine']
+
+
+
+
+  # networks:
+  #   - network: < network using CIDR notation >
+  #     tags: < list of tags to use to filter inventory during tests >
+  #     disable_cache: < Disable cache per network. Default is False. >
+  # ranges:
+  #   - start: < first ip address value of the range >
+  #     end: < last ip address value of the range >
+  #     tags: < list of tags to use to filter inventory during tests >
+  #     disable_cache: < Disable cache per range. Default is False. >

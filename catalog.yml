@@ -1,0 +1,21 @@
+anta.tests.software:
+  - VerifyEOSVersion:
+      versions:
+        - 4.32.1F
+        - 4.32.1F-37265360.4321F (engineering build)
+anta.tests.routing:
+  bgp:
+    - VerifyBGPPeerCount:
+        address_families:
+          - afi: "ipv4"
+            safi: "unicast"
+            num_peers: 5
+        filters:
+            tags: ['leaf']
+    - VerifyBGPPeerCount:
+        address_families:
+          - afi: "ipv4"
+            safi: "unicast"
+            num_peers: 4
+        filters:
+            tags: ['spine']
